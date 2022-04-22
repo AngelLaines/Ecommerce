@@ -7,7 +7,7 @@ import secrets
 import bd,sys
 import json
 
-
+# que rico 4litro
 bdEcommerce=bd.datos()
 
 app = Flask(__name__)

@@ -1,0 +1,88 @@
+drop table if exists informacionEnvio;
+drop table if exists detallePedido;
+drop table if exists carrito;
+drop table if exists producto;
+drop table if exists catalogo;
+drop table if exists proveedor;
+drop table if exists clientes;
+drop table if exists usuario;
+create table if not exists usuario(
+	idUsuario varchar(10),
+	email varchar(30),
+	contraseña varchar(20),
+	tipo varchar(10),
+	unique (email),
+	primary key(idUsuario)
+);
+create table if not exists clientes(
+	idCliente varchar(10),
+	idUsuario varchar(10),
+	nombre varchar(20),
+	apellidoP varchar(20),
+	apellidoM varchar(20),
+	telefono varchar(20),
+	pais varchar(50),
+	ciudad varchar(20),
+	colonia varchar(20),
+	codigoPostal int,
+	direccion varchar(50),
+	fechaRegistro time,
+	primary key(idCliente),
+	foreign key (idUsuario)
+	references usuario(idUsuario)
+);
+create table if not exists proveedor(
+	idProveedor int,
+	nombreProveedor varchar(50),
+	primary key(idProveedor)
+);
+create table if not exists catalogo(
+	idCatalogo int,
+	nombreCategoria varchar(20),
+	primary key(idCatalogo)
+);
+create table if not exists producto(
+	idProducto int,
+	idCatalogo int,
+	idProveedor int,
+	nombreProducto varchar(50),
+	precioUnitario real,
+	cantidad int,
+	primary key(idProducto),
+	foreign key (idCatalogo)
+	references catalogo(idcatalogo),
+	foreign key(idProveedor)
+	references proveedor(idProveedor)
+);
+create table if not exists carrito(
+	idCarrito int,
+	idCliente varchar(10),
+	idProducto int,
+	cantidad int,
+	subTotal real,
+	fechaAgregado time,
+	foreign key(idCliente)
+	references clientes (idCliente),
+	foreign key(idProducto)
+	references producto (idProducto)
+);
+create table if not exists detallePedido(
+	idOrden int,
+	idProducto int,
+	idCliente varchar(10),
+	cantidad int,
+	subTotal real,
+	fechaPedido time,
+	primary key(idOrden),
+	foreign key(idProducto)
+	references producto(idProducto),
+	foreign key(idCliente)
+	references clientes (idCliente)
+);
+create table if not exists informacionEnvio(
+	idEnvio int,
+	tipoEnvio varchar(20),
+	costoEnvio real,
+	idRegionEnvio int,
+	primary key(idEnvio)
+)

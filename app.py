@@ -16,7 +16,24 @@ app.config['UPLOAD_FOLDER'] = './static/img'
 
 @app.route('/shop',methods=["GET","POST"])
 def tienda():
-    return render_template('shop.html')
+    error=None
+   
+    productRow=bdEcommerce.buscar("producto")
+    if 'idUsuario' in session and 'tipo' in session:
+        userRow=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
+        if request.method=='POST':
+            print(request.form['nameProduct'])
+            if request.form['submitButton']=="ver producto":
+                print("ver producto")
+                return redirect('/')
+            if request.form['submitButton']=="añadir al carrito":
+                print("añadir al carrito")
+                return redirect('/')
+            return redirect('/')
+        if session['tipo']=="Admin":
+            return render_template('shop.html',productos=productRow,tipo=session['tipo'])
+        return render_template('shop.html',user=userRow[0][2],productos=productRow)
+    return render_template('shop.html',productos=productRow)
 
 @app.route('/modificarProducto',methods=["GET","POST"])
 def modificar():
@@ -32,7 +49,7 @@ def modificar():
             sql="update producto set nombreproducto='"+nombre+"', preciounitario="+preciounitario+", idproveedor="+str(idProveedor)+", idcatalogo="+str(idCategoria)+" where idProducto="+str(id)
             bdEcommerce.update(sql)
             return redirect('/modificarProducto')
-        return render_template('ModificarProducto.html')
+        return render_template('ModificarProducto.html',tipo=session['tipo'])
 
 @app.route('/buscar',methods=["GET","POST"])
 def buscar():
@@ -48,6 +65,7 @@ def buscar():
         for elemento in rowsC:
             categoria.append(elemento[1])
         return render_template('ModificarProducto.html',nombre=datos[0][1],precio=datos[0][2],tProveedor=proveedor,tCategoria=categoria)
+
 @app.route('/eliminarProducto',methods=["GET","POST"])
 def deleteProduct():
     error=None
@@ -62,7 +80,7 @@ def deleteProduct():
             return redirect('/eliminarProducto')
         else:
             rows=bdEcommerce.buscar("producto")
-            return render_template("eliminarProducto.html",productos=rows)
+            return render_template("eliminarProducto.html",productos=rows,tipo=session['tipo'])
 
 @app.route('/añadirProducto',methods=["GET","POST"])
 def addProduct():
@@ -106,7 +124,7 @@ def addProduct():
                 
             print(proveedor)
             print(categoria)
-            return render_template("añadirProducto.html",tProveedor=proveedor,tCategoria=categoria)
+            return render_template("añadirProducto.html",tipo=session['tipo'],tProveedor=proveedor,tCategoria=categoria)
 
 @app.route('/añadirProveedor',methods=["GET","POST"])
 def proveedores():
@@ -140,13 +158,14 @@ def añadircarrito():
 @app.route('/')
 def index():
     error=None
+    rowCate=bdEcommerce.buscar("catalogo")
     if 'idUsuario' in session and 'tipo' in session:
         if session['tipo']=='Admin':
-            return render_template('index.html',tipo=session['tipo'])
+            return render_template('index.html',tipo=session['tipo'],categorias=rowCate)
         else:
-            row=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
-            return render_template('index.html',user=row[0][2])
-    return render_template('index.html')
+            row=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'],categorias=rowCate)
+            return render_template('index.html',user=row[0][2],categorias=rowCate)
+    return render_template('index.html',categorias=rowCate)
 
 @app.route('/actualizarDatosCliente',methods=['GET','POST'])
 def actualizarDatosUsuario():
@@ -227,7 +246,7 @@ def checkout():
                 return redirect('/')
         else:
             return render_template('checkout.html',email=session['email'])
-    
+    return redirect('/login')
 
 @app.route('/registro',methods=["GET","POST"])
 def registro():

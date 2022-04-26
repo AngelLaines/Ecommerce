@@ -33,7 +33,7 @@ class datos():
         sql="insert into "+tabla+" values("
         i=1
         for n in datos:
-            if type(datos[n])==int:
+            if type(datos[n])==int or type(datos[n])==float:
                 sql+=str(datos[n])
             else:
                 sql+="'"+datos[n]+"'"

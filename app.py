@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, session
 from flask.templating import render_template_string
 from numpy import empty
-from werkzeug.utils import redirect
+from werkzeug.utils import redirect,secure_filename
 from datetime import datetime
 import secrets
-import bd,sys
+import bd,sys,os
 import json
 
 # que rico 4litro
@@ -12,14 +12,79 @@ bdEcommerce=bd.datos()
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
+app.config['UPLOAD_FOLDER'] = './static/img'
 
 @app.route('/shop',methods=["GET","POST"])
 def tienda():
     return render_template('shop.html')
 
+@app.route('/añadirProducto',methods=["GET","POST"])
+def addProduct():
+    error=None
+    if 'idUsuario' in session and 'tipo' in session:
+        if request.method=='POST':
+            f = request.files['imagen']
+            filename = secure_filename(f.filename)
+            print(filename)
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            idProducto=int(datetime.today().strftime('%H%S%m%d'))+666
+            nombre=request.form['nombre']
+            idProveedor=bdEcommerce.buscarUnaLinea("proveedor","nombreproveedor",request.form.get('proveedor'))[0][0]
+            idCategoria=bdEcommerce.buscarUnaLinea("catalogo","nombrecategoria",request.form.get('categoria'))[0][0]
+            preciounitario=float(request.form['precio'])
+            
+            datos={
+                'idproducto':idProducto,
+                'nombre':nombre,
+                'precio':preciounitario,
+                'idcatalogo':idCategoria,
+                'idproveedor':idProveedor
+            }
+            bdEcommerce.insertar("producto",datos)
+            
+            rutaO='./static/img/'+str(filename)
+            
+            nombre_nuevo='./static/img/'+str(idProducto)+'.'+filename.split('.')[1]
+            os.rename(rutaO, nombre_nuevo)
+            return redirect('/añadirProducto')
+        else:
+            proveedor=list()
+            categoria=list()
+            rowsP=bdEcommerce.buscar("proveedor")
+            rowsC=bdEcommerce.buscar("catalogo")
+            
+            for elemento in rowsP:
+                proveedor.append(elemento[1])
+            for elemento in rowsC:
+                categoria.append(elemento[1])
+                
+            print(proveedor)
+            print(categoria)
+            return render_template("añadirProducto.html",tProveedor=proveedor,tCategoria=categoria)
+
 @app.route('/añadirProveedor',methods=["GET","POST"])
 def proveedores():
-    return render_template("añadirProveedor.html")
+    error=None
+    if 'idUsuario' in session and 'tipo' in session:
+        if request.method=='POST':
+            proveedor=request.form['nombre']
+            idProveedor=int(datetime.today().strftime('%H%S%m%d'))+900
+            dictDatos={'idProveedor':idProveedor,'proveedor':proveedor}
+            bdEcommerce.insertar("proveedor",dictDatos)
+            return redirect('/añadirProveedor')
+        return render_template("añadirProveedor.html",tipo=session['tipo'])
+    
+@app.route('/añadirCategoria',methods=["GET","POST"])
+def categorias():
+    error=None
+    if 'idUsuario' in session and 'tipo' in session:
+        if request.method=='POST':
+            categoria=request.form['nombre']
+            idCategoria=int(datetime.today().strftime('%H%S%m%d'))+800
+            dictDatos={'idCategoria':idCategoria,'categoria':categoria}
+            bdEcommerce.insertar("catalogo",dictDatos)
+            return redirect('/añadirCategoria')
+        return render_template("añadirCategoria.html",tipo=session['tipo'])
 
 @app.route('/añadiralcarrito',methods=["GET","POST"])
 def añadircarrito():

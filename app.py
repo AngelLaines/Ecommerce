@@ -17,6 +17,10 @@ app.secret_key = secrets.token_hex(16)
 def tienda():
     return render_template('shop.html')
 
+@app.route('/añadirProveedor',methods=["GET","POST"])
+def proveedores():
+    return render_template("añadirProveedor.html")
+
 @app.route('/añadiralcarrito',methods=["GET","POST"])
 def añadircarrito():
     print(request.form.get('p1'))

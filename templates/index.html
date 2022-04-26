@@ -149,7 +149,14 @@
                             <a href="/logout" class="nav-item nav-link">Cerrar sesión</a>
                             {% else %}
                                 {% if tipo %}
-                                <a href='/' class="nav-item nav-link">{{tipo}}</a>
+                                <!--<a href='/' class="nav-item nav-link">{{tipo}}</a>-->
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">{{tipo}}</a>
+                                    <div class="dropdown-menu rounded-0 m-0">
+                                        <a href="/" class="dropdown-item">Añadir producto</a>
+                                        <a href="/" class="dropdown-item">Modificar producto</a>
+                                    </div>
+                                </div>
                                 <a href="/logout" class="nav-item nav-link">Cerrar sesión</a>
                                 {% else %}
                                 <a href="/login" class="nav-item nav-link">Login</a>

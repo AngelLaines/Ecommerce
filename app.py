@@ -18,6 +18,52 @@ app.config['UPLOAD_FOLDER'] = './static/img'
 def tienda():
     return render_template('shop.html')
 
+@app.route('/modificarProducto',methods=["GET","POST"])
+def modificar():
+    error=None
+    if 'idUsuario' in session and 'tipo' in session:
+        if request.method=='POST':
+            id=session['idProducto']
+            nombre=request.form['nombre']
+            idProveedor=bdEcommerce.buscarUnaLinea("proveedor","nombreproveedor",request.form.get('proveedor'))[0][0]
+            idCategoria=bdEcommerce.buscarUnaLinea("catalogo","nombrecategoria",request.form.get('categoria'))[0][0]
+            preciounitario=str(request.form['precio'])
+            
+            sql="update producto set nombreproducto='"+nombre+"', preciounitario="+preciounitario+", idproveedor="+str(idProveedor)+", idcatalogo="+str(idCategoria)+" where idProducto="+str(id)
+            bdEcommerce.update(sql)
+            return redirect('/modificarProducto')
+        return render_template('ModificarProducto.html')
+
+@app.route('/buscar',methods=["GET","POST"])
+def buscar():
+    if request.method=='POST':
+        session['idProducto']=request.form['idProducto']
+        datos=bdEcommerce.buscarUnaLinea("producto","idProducto",request.form['idProducto'])
+        proveedor=list()
+        categoria=list()
+        rowsP=bdEcommerce.buscar("proveedor")
+        rowsC=bdEcommerce.buscar("catalogo")
+        for elemento in rowsP:
+            proveedor.append(elemento[1])
+        for elemento in rowsC:
+            categoria.append(elemento[1])
+        return render_template('ModificarProducto.html',nombre=datos[0][1],precio=datos[0][2],tProveedor=proveedor,tCategoria=categoria)
+@app.route('/eliminarProducto',methods=["GET","POST"])
+def deleteProduct():
+    error=None
+    if 'idUsuario' in session and 'tipo' in session:
+        if request.method=='POST':
+            listaEliminar = request.form.getlist('checkbox')
+            print(listaEliminar)
+            for elemento in listaEliminar:
+                sql="delete from producto where idProducto="+str(elemento)
+                bdEcommerce.delete(sql)
+                os.remove('./static/img/'+elemento+'.png')
+            return redirect('/eliminarProducto')
+        else:
+            rows=bdEcommerce.buscar("producto")
+            return render_template("eliminarProducto.html",productos=rows)
+
 @app.route('/añadirProducto',methods=["GET","POST"])
 def addProduct():
     error=None

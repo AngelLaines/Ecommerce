@@ -51,3 +51,9 @@ class datos():
         cursor1.execute(consulta)
         self.conexion.commit()
         cursor1.close()
+        
+    def delete(self, consulta):
+        cursor1=self.conexion.cursor()
+        cursor1.execute(consulta)
+        self.conexion.commit()
+        cursor1.close()

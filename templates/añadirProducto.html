@@ -120,9 +120,9 @@
                                 <div class="nav-item dropdown">
                                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">{{tipo}}</a>
                                     <div class="dropdown-menu rounded-0 m-0">
-                                        <a href="/" class="dropdown-item">Añadir producto</a>
-                                        <a href="/" class="dropdown-item">Modificar producto</a>
-                                        <a href="/" class="dropdown-item">Eliminar producto</a>
+                                        <a href="/añadirProducto" class="dropdown-item">Añadir producto</a>
+                                        <a href="/modificarProducto" class="dropdown-item">Modificar producto</a>
+                                        <a href="/eliminarProducto" class="dropdown-item">Eliminar producto</a>
                                         <a href="/añadirCategoria" class="dropdown-item">Añadir categoria</a>
                                         <a href="/añadirProveedor" class="dropdown-item">Añadir proveedor</a>
                                     </div>
@@ -149,7 +149,7 @@
             <div class="d-inline-flex">
                 <p class="m-0"><a href="">Home</a></p>
                 <p class="m-0 px-2">-</p>
-                <p class="m-0">añadir producto</p>
+                <p class="m-0">Añadir producto</p>
             </div>
         </div>
     </div>
@@ -193,8 +193,8 @@
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <label>Imagen</label>
-                            <input class="form-control" type="file" placeholder="Fanny" value="{{request.form.imagen}}" name="imagen">
+                            <label>Imagen (Formato PNG)</label>
+                            <input class="form-control" type="file" accept="image/PNG" placeholder="Fanny" value="{{request.form.imagen}}" name="imagen">
                         </div>
                     </div>
                 </div>

@@ -67,15 +67,24 @@
             <div class="col-lg-6 col-6 text-left">
                 <form action="">
                     <div class="input-group">
-                        
+                        <input type="text" class="form-control" placeholder="Search for products">
                         <div class="input-group-append">
-                            
+                            <span class="input-group-text bg-transparent text-primary">
+                                <i class="fa fa-search"></i>
+                            </span>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="col-lg-3 col-6 text-right">
-                
+                <a href="" class="btn border">
+                    <i class="fas fa-heart text-primary"></i>
+                    <span class="badge">0</span>
+                </a>
+                <a href="" class="btn border">
+                    <i class="fas fa-shopping-cart text-primary"></i>
+                    <span class="badge">0</span>
+                </a>
             </div>
         </div>
     </div>
@@ -85,6 +94,9 @@
     <!-- Navbar Start -->
     <div class="container-fluid">
         <div class="row border-top px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+               
+            </div>
             <div class="col-lg-9">
                 <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
                     <a href="" class="text-decoration-none d-block d-lg-none">
@@ -133,11 +145,11 @@
     <!-- Page Header Start -->
     <div class="container-fluid bg-secondary mb-5">
         <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
-            <h1 class="font-weight-semi-bold text-uppercase mb-3">Añadir Proveedor</h1>
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Editar producto</h1>
             <div class="d-inline-flex">
                 <p class="m-0"><a href="">Home</a></p>
                 <p class="m-0 px-2">-</p>
-                <p class="m-0">Añadir Proveedor</p>
+                <p class="m-0">Añadir producto</p>
             </div>
         </div>
     </div>
@@ -145,32 +157,64 @@
 
 
     <!-- Checkout Start -->
-    <form action="" method='post'>
+    
     <div class="container-fluid pt-5">
         <div class="row px-xl-5">
             <div class="col-lg-8">
                 <div class="mb-4">
-                    <h4 class="font-weight-semi-bold mb-4">Agrega un proveedor</h4>
+                    <h4 class="font-weight-semi-bold mb-4">Editar producto</h4>
                     <div class="row">
+                        <form action="/buscar" method='post' enctype="multipart/form-data">
+                            <div class="col-md-6 form-group">
+                                <label>ID Producto</label>
+                                <input class="form-control" type="text" placeholder="123456" value="{{request.form.idProducto}}" name="idProducto">
+                            </div>
+                            <button type='submit' class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Buscar</button>
+                        </form>
+                        <form action="/modificarProducto" method='post' enctype="multipart/form-data">
                         <div class="col-md-6 form-group">
-                            <label>Nombre</label>
-                            <input class="form-control" type="text" placeholder="Fanny" value="{{request.form.nombre}}" name="nombre">
+                            <label>Nombre(s)</label>
+                            <input class="form-control" type="text" placeholder="Fanny" value="{{nombre}}" name="nombre">
                         </div>
                         
+                        <div class="col-md-6 form-group">
+                            <label>Proveedor</label>
+                            <select class="custom-select" name="proveedor">
+                            {% for element in tProveedor %}
+                            <option>{{element}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label>Categoria</label>
+                            <select class="custom-select" name="categoria">
+                            {% for element in tCategoria %}
+                            <option>{{element}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 form-group">
+                            <label>Precio unitario</label>
+                            <input class="form-control" type="text" placeholder="6.66" value="{{precio}}" name="precio">
+                        </div>
+                        <button type='submit' class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Registrar datos de producto</button>
+                    </form>
                     </div>
                 </div>
-                <button type='submit' class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Registrar datos de proveedor</button>
+                
             </div>
             
         </div>
     </div>
-    </form>
+    
     <!-- Checkout End -->
 
 
     <!-- Footer Start -->
     <div class="container-fluid bg-secondary text-dark mt-5 pt-5">
-        
+       
     </div>
     <!-- Footer End -->
 

@@ -23,6 +23,7 @@ class datos():
     def buscarUnaLinea(self,tabla,where,condicion):
         cursor1=self.conexion.cursor()
         sql="select * from "+tabla+ " where "+where+"='"+condicion+"'"
+        print(sql)
         cursor1.execute(sql)
         consulta=cursor1.fetchall()
         cursor1.close()
@@ -42,6 +43,7 @@ class datos():
             else:
                 sql+=","
             i+=1
+        print(sql)
         cursor1.execute(sql)
         self.conexion.commit()
         cursor1.close()
@@ -57,3 +59,13 @@ class datos():
         cursor1.execute(consulta)
         self.conexion.commit()
         cursor1.close()
+        
+    def search(self,tabla,condicion):
+        cursor1=self.conexion.cursor()
+        #carrito ca join producto pr on ca.idproducto=pr.idproducto
+        sql="select * from "+tabla+ " ca join producto pr on ca.idproducto=pr.idproducto where "+condicion
+        print(sql)
+        cursor1.execute(sql)
+        consulta=cursor1.fetchall()
+        cursor1.close()
+        return consulta

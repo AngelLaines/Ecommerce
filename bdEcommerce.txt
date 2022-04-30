@@ -22,11 +22,12 @@ create table if not exists clientes(
 	apellidoM varchar(20),
 	telefono varchar(20),
 	pais varchar(50),
+	estado varchar(50),
 	ciudad varchar(20),
 	colonia varchar(20),
 	codigoPostal int,
 	direccion varchar(50),
-	fechaRegistro time,
+	fechaRegistro date,
 	primary key(idCliente),
 	foreign key (idUsuario)
 	references usuario(idUsuario)
@@ -60,7 +61,8 @@ create table if not exists carrito(
 	idProducto int,
 	cantidad int,
 	subTotal real,
-	fechaAgregado time,
+	fechaAgregado date,
+	estado varchar(20),
 	foreign key(idCliente)
 	references clientes (idCliente),
 	foreign key(idProducto)
@@ -72,7 +74,7 @@ create table if not exists detallePedido(
 	idCliente varchar(10),
 	cantidad int,
 	subTotal real,
-	fechaPedido time,
+	fechaPedido date,
 	primary key(idOrden),
 	foreign key(idProducto)
 	references producto(idProducto),

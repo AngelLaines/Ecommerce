@@ -7,7 +7,6 @@ import secrets
 import bd,sys,os
 import json
 
-# que rico 4litro
 bdEcommerce=bd.datos()
 
 app = Flask(__name__)
@@ -17,23 +16,47 @@ app.config['UPLOAD_FOLDER'] = './static/img'
 @app.route('/shop',methods=["GET","POST"])
 def tienda():
     error=None
-   
+    rowCate=bdEcommerce.buscar("catalogo")
     productRow=bdEcommerce.buscar("producto")
     if 'idUsuario' in session and 'tipo' in session:
         userRow=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
         if request.method=='POST':
-            print(request.form['nameProduct'])
             if request.form['submitButton']=="ver producto":
                 print("ver producto")
                 return redirect('/')
             if request.form['submitButton']=="añadir al carrito":
-                print("añadir al carrito")
-                return redirect('/')
+                carrito=bdEcommerce.buscar("carrito")
+                nombre=request.form['nameProduct']
+                idProducto=request.form['IdProduct']
+                
+                if len(carrito)>0:
+                    idCarrito=bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])[0][0]
+                else:
+                    idCarrito=int(datetime.today().strftime('%H%S%m%d'))+9999
+                
+                IdCliente=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])[0][0]
+                cantidad=1
+                subTotal=cantidad*float(request.form['price'])
+                fecha=str(datetime.today().strftime('%Y-%m-%d'))
+                print(idCarrito)
+                print(subTotal)
+                datos={
+                    'idCarrito':idCarrito,
+                    'idcliente':IdCliente,
+                    'idProducto':idProducto,
+                    'cantidad':cantidad,
+                    'subtotal':subTotal,
+                    'fechaagregado':fecha,
+                    'estado':'En carrito'
+                    
+                }
+                bdEcommerce.insertar("carrito",datos)
+                return redirect('/carrito')
             return redirect('/')
         if session['tipo']=="Admin":
-            return render_template('shop.html',productos=productRow,tipo=session['tipo'])
-        return render_template('shop.html',user=userRow[0][2],productos=productRow)
-    return render_template('shop.html',productos=productRow)
+            return render_template('shop.html',productos=productRow,tipo=session['tipo'],categorias=rowCate)
+        return render_template('shop.html',user=userRow[0][2],productos=productRow,categorias=rowCate)
+    return render_template('shop.html',productos=productRow,categorias=rowCate)
 
 @app.route('/modificarProducto',methods=["GET","POST"])
 def modificar():
@@ -93,16 +116,18 @@ def addProduct():
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             idProducto=int(datetime.today().strftime('%H%S%m%d'))+666
             nombre=request.form['nombre']
+            print(request.form.get('proveedor'))
+            print(request.form.get('categoria'))
             idProveedor=bdEcommerce.buscarUnaLinea("proveedor","nombreproveedor",request.form.get('proveedor'))[0][0]
             idCategoria=bdEcommerce.buscarUnaLinea("catalogo","nombrecategoria",request.form.get('categoria'))[0][0]
             preciounitario=float(request.form['precio'])
             
             datos={
                 'idproducto':idProducto,
-                'nombre':nombre,
-                'precio':preciounitario,
                 'idcatalogo':idCategoria,
-                'idproveedor':idProveedor
+                'idproveedor':idProveedor,
+                'nombre':nombre,
+                'precio':preciounitario
             }
             bdEcommerce.insertar("producto",datos)
             
@@ -150,10 +175,21 @@ def categorias():
             return redirect('/añadirCategoria')
         return render_template("añadirCategoria.html",tipo=session['tipo'])
 
-@app.route('/añadiralcarrito',methods=["GET","POST"])
+@app.route('/carrito',methods=["GET","POST"])
 def añadircarrito():
-    print(request.form.get('p1'))
-    return redirect('/')
+    error=None
+    if 'idUsuario' in session and 'tipo' in session:
+        idcliente=bdEcommerce.buscarUnaLinea("clientes","idusuario",session['idUsuario'])[0][0]
+        condicion="ca.idCliente='"+str(idcliente)+"' and ca.estado='En carrito'"
+        cart=bdEcommerce.search("carrito",condicion)
+        
+        sub=float()
+        for producto in cart:
+            sub+=float(producto[11])
+            
+        envio=10.0
+        return render_template("cart.html",carrito=cart,subTotal=str(sub),shipping=str(envio),total=str(envio+sub))
+    return redirect('/login')
 
 @app.route('/')
 def index():
@@ -163,7 +199,7 @@ def index():
         if session['tipo']=='Admin':
             return render_template('index.html',tipo=session['tipo'],categorias=rowCate)
         else:
-            row=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'],categorias=rowCate)
+            row=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
             return render_template('index.html',user=row[0][2],categorias=rowCate)
     return render_template('index.html',categorias=rowCate)
 
@@ -200,7 +236,6 @@ def actualizarDatosUsuario():
                                 email=bdEcommerce.buscarUnaLinea("usuario","idUsuario",session['idUsuario'])[0][1])
     return redirect("/checkout")
     
-
 @app.route('/logout')
 def cerrar_sesion():
     if 'idUsuario' in session:

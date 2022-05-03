@@ -87,7 +87,7 @@ def buscar():
             proveedor.append(elemento[1])
         for elemento in rowsC:
             categoria.append(elemento[1])
-        return render_template('ModificarProducto.html',nombre=datos[0][1],precio=datos[0][2],tProveedor=proveedor,tCategoria=categoria)
+        return render_template('ModificarProducto.html',nombre=datos[0][3],precio=datos[0][4],tProveedor=proveedor,tCategoria=categoria)
 
 @app.route('/eliminarProducto',methods=["GET","POST"])
 def deleteProduct():
@@ -200,7 +200,10 @@ def index():
             return render_template('index.html',tipo=session['tipo'],categorias=rowCate)
         else:
             row=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
-            return render_template('index.html',user=row[0][2],categorias=rowCate)
+            if len(row)>0:
+                return render_template('index.html',user=row[0][2],categorias=rowCate)
+            else:
+                return redirect('/checkout')
     return render_template('index.html',categorias=rowCate)
 
 @app.route('/actualizarDatosCliente',methods=['GET','POST'])
@@ -240,6 +243,7 @@ def actualizarDatosUsuario():
 def cerrar_sesion():
     if 'idUsuario' in session:
         session.pop('idUsuario', None)
+        session.pop('email', None)
         return redirect('/')
 
 @app.route('/checkout',methods=['GET','POST'])

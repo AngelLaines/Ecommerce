@@ -81,10 +81,17 @@
                     <i class="fas fa-heart text-primary"></i>
                     <span class="badge">0</span>
                 </a>
+                {% if numCart %}
+                <a href="/carrito" class="btn border">
+                    <i class="fas fa-shopping-cart text-primary"></i>
+                    <span class="badge">{{numCart}}</span>
+                </a>
+                {% else %}
                 <a href="" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
                     <span class="badge">0</span>
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -156,8 +163,8 @@
                                 </div>
                                 <a href="/logout" class="nav-item nav-link">Cerrar sesión</a>
                                 {% else %}
-                                <a href="/login" class="nav-item nav-link">Login</a>
-                                <a href="/registro" class="nav-item nav-link">Register</a>
+                                <a href="/login" class="nav-item nav-link">Iniciar sesion</a>
+                                <a href="/registro" class="nav-item nav-link">Registrate</a>
                                 {% endif %}
                             {% endif %}
                         </div>
@@ -241,7 +248,7 @@
                         </div>
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">${{envio}}</h6>
+                            <h6 class="font-weight-medium">${{shipping}}</h6>
                         </div>
                     </div>
                     <div class="card-footer border-secondary bg-transparent">

@@ -81,10 +81,17 @@
                     <i class="fas fa-heart text-primary"></i>
                     <span class="badge">0</span>
                 </a>
+                {% if numCart %}
+                <a href="/carrito" class="btn border">
+                    <i class="fas fa-shopping-cart text-primary"></i>
+                    <span class="badge">{{numCart}}</span>
+                </a>
+                {% else %}
                 <a href="" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
                     <span class="badge">0</span>
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -135,7 +142,7 @@
                             <a href="/shop" class="nav-item nav-link">Tienda</a>
                             
                             <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Paginas</a>
                                 <div class="dropdown-menu rounded-0 m-0">
                                     <a href="/carrito" class="dropdown-item">Carrito de compras</a>
                                     

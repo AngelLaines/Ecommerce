@@ -22,7 +22,7 @@ def tienda():
         userRow=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
         idcliente=bdEcommerce.buscarUnaLinea("clientes","idusuario",session['idUsuario'])[0][0]
         condicion="ca.idCliente='"+str(idcliente)+"' and ca.estado='En carrito'"
-        cart=bdEcommerce.search("carrito",condicion)
+        cart=bdEcommerce.search("carrito"," ca join producto pr on ca.idproducto=pr.idproducto where ",condicion)
         if request.method=='POST':
             if request.form['submitButton']=="ver producto":
                 print("ver producto")
@@ -53,9 +53,10 @@ def tienda():
                     'estado':'En carrito'
                     
                 }
-                if len(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])) > 0:
-                    cantidad=int(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])[0][3])+1
-                    sql = "update carrito set cantidad = "+str(cantidad)+ " where idCliente='"+IdCliente+"'"
+                if len(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])) > 1:
+                    cantidad=float(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])[0][3])+1
+                    subtotal = float(bdEcommerce.buscarUnaLinea("producto","idProducto",request.form['IdProduct'])[0][4])*cantidad
+                    sql = "update carrito set cantidad = "+str(cantidad)+ ", subtotal = "+str(round(subtotal,2))+" where idCliente='"+str(IdCliente)+"' and idProducto="+request.form['IdProduct']+" and idCarrito="+str(idCarrito)
                     bdEcommerce.update(sql)
                 else:
                     bdEcommerce.insertar("carrito",datos)
@@ -187,24 +188,44 @@ def categorias():
 def añadircarrito():
     error=None
     if 'idUsuario' in session and 'tipo' in session:
-        if request.method == 'POST':
-            if request.form['submitButton']=='increase':
-                pass
-            if request.form['submitButton']=='decrease':
-                pass
-            if request.form['submitButton']=='delete':
-                pass
+        userRow=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
+        IdCliente=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])[0][0]
+        
         idcliente=bdEcommerce.buscarUnaLinea("clientes","idusuario",session['idUsuario'])[0][0]
         condicion="ca.idCliente='"+str(idcliente)+"' and ca.estado='En carrito'"
-        cart=bdEcommerce.search("carrito",condicion)
-        userRow=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])
+        cart=bdEcommerce.search("carrito"," ca join producto pr on ca.idproducto=pr.idproducto where ",condicion)
+        
         sub=float()
         for producto in cart:
-            sub+=float(producto[11])
+            sub+=float(producto[4])
             
         envio=10.0
         
-        return render_template("cart.html",carrito=cart,subTotal=str(sub),shipping=str(envio),total=str(round((envio+sub),2)),user=userRow[0][2])
+        if request.method == 'POST':
+            idCarrito=cart[0][0]
+            sql = " where idCliente='"+str(IdCliente)+"' and idProducto="+request.form['idProducto']+" and idCarrito="+str(idCarrito)
+            if request.form['submitButton']=='increase':
+                cantidad=float(bdEcommerce.search("carrito","",sql)[0][3])+1
+                subtotal = float(bdEcommerce.buscarUnaLinea("producto","idProducto",request.form['idProducto'])[0][4])*cantidad
+                sql = "update carrito set cantidad = "+str(cantidad)+ ", subtotal = "+str(round(subtotal,2))+" where idCliente='"+str(IdCliente)+"' and idProducto="+request.form['idProducto']+" and idCarrito="+str(idCarrito)
+                bdEcommerce.update(sql)
+                return redirect('/carrito')
+            if request.form['submitButton']=='decrease':
+                cantidad=float(bdEcommerce.search("carrito","",sql)[0][3])-1
+                subtotal = float(bdEcommerce.buscarUnaLinea("producto","idProducto",request.form['idProducto'])[0][4])*cantidad
+                if cantidad == 0:
+                    pass
+                else:
+                    sql = "update carrito set cantidad = "+str(cantidad)+ ", subtotal = "+str(round(subtotal,2))+" where idCliente='"+str(IdCliente)+"' and idProducto="+request.form['idProducto']+" and idCarrito="+str(idCarrito)
+                    bdEcommerce.update(sql)
+                return redirect('/carrito')
+            if request.form['submitButton']=='delete':
+                idProducto = request.form['idProducto']
+                sql = "delete from carrito where idProducto="+idProducto+" and idCliente='"+idcliente+"'"
+                bdEcommerce.delete(sql)
+                return redirect('/carrito')
+        
+        return render_template("cart.html",carrito=cart,subTotal=str(round(sub,2)),shipping=str(envio),total=str(round((envio+sub),2)),user=userRow[0][2])
     return redirect('/login')
 
 @app.route('/',methods=["GET","POST"])
@@ -244,9 +265,11 @@ def index():
                     'estado':'En carrito'
                     
                 }
-                if len(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])) > 0:
-                    cantidad=int(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])[0][3])+1
-                    sql = "update carrito set cantidad = "+str(cantidad)+ " where idCliente='"+IdCliente+"'"
+                print(len(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])))
+                if len(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])) > 1:
+                    cantidad=float(bdEcommerce.buscarUnaLinea("carrito","idCliente",userRow[0][0])[0][3])+1
+                    subtotal = float(bdEcommerce.buscarUnaLinea("producto","idProducto",request.form['IdProduct'])[0][4])*cantidad
+                    sql = "update carrito set cantidad = "+str(cantidad)+ ", subtotal = "+str(round(subtotal,2))+" where idCliente='"+str(IdCliente)+"' and idProducto="+request.form['IdProduct']+" and idCarrito="+str(idCarrito)
                     bdEcommerce.update(sql)
                 else:
                     bdEcommerce.insertar("carrito",datos)
@@ -258,7 +281,7 @@ def index():
             if len(row)>0:
                 idcliente=bdEcommerce.buscarUnaLinea("clientes","idusuario",session['idUsuario'])[0][0]
                 condicion="ca.idCliente='"+str(idcliente)+"' and ca.estado='En carrito'"
-                cart=bdEcommerce.search("carrito",condicion)
+                cart=bdEcommerce.search("carrito"," ca join producto pr on ca.idproducto=pr.idproducto where ",condicion)
                 return render_template('index.html',user=row[0][2],categorias=rowCate,numCart=len(cart),productos=productRow)
             else:
                 return redirect('/checkout')
@@ -272,24 +295,45 @@ def actualizarDatosUsuario():
     row=list()
     if (session['idUsuario']) and session['tipo']=='cliente':
         row=bdEcommerce.buscarUnaLinea("clientes","idUsuario",session['idUsuario'])[0]
+        
     
         
     if request.method=='POST':
-        idCliente= row[0]
-        print(idCliente)
-        nombre=request.form['nombre']
-        apellidoP=request.form['apellidoP']
-        apellidoM=request.form['apellidoM']
-        telefono=request.form['telefono']
-        pais=request.form.get('pais')
-        estado=request.form['estado']
-        ciudad=request.form['ciudad']
-        colonia=request.form['colonia']
-        codigoPostal=request.form['codigoPostal']
-        direccion=request.form['direccion']
-        update="update clientes set nombre='"+nombre+"', apellidop='"+apellidoP+"', apellidom='"+apellidoM+"', telefono='"+telefono+"', pais='"+pais+"', estado='"+estado+"', ciudad='"+ciudad+"', colonia='"+colonia+"', codigopostal="+codigoPostal+", direccion='"+direccion+"' where idcliente='"+idCliente+"'"
-        bdEcommerce.update(update)
-        return redirect('/')
+        if request.form['submitButton']=='check':
+            idCliente= row[0]
+            print(idCliente)
+            nombre=request.form['nombre']
+            apellidoP=request.form['apellidoP']
+            apellidoM=request.form['apellidoM']
+            telefono=request.form['telefono']
+            pais=request.form.get('pais')
+            estado=request.form['estado']
+            ciudad=request.form['ciudad']
+            colonia=request.form['colonia']
+            codigoPostal=request.form['codigoPostal']
+            direccion=request.form['direccion']
+            update="update clientes set nombre='"+nombre+"', apellidop='"+apellidoP+"', apellidom='"+apellidoM+"', telefono='"+telefono+"', pais='"+pais+"', estado='"+estado+"', ciudad='"+ciudad+"', colonia='"+colonia+"', codigopostal="+codigoPostal+", direccion='"+direccion+"' where idcliente='"+idCliente+"'"
+            bdEcommerce.update(update)
+            return redirect('/')
+        if request.form['submitButton']=='user':
+            email=request.form['email']
+            password=request.form['password']
+            confirmPassword=request.form['confirmPassword']
+            if email!="":
+                sql = "update usuario set email='"+email+"' where idUsuario='"+session['idUsuario']+"'"
+                bdEcommerce.update(sql)
+            if password=="" and confirmPassword=="":
+                pass
+            if password!="":
+                if confirmPassword!="":
+                    sql = "update usuario set contraseña='"+password+"' where idUsuario='"+session['idUsuario']+"'"
+                    bdEcommerce.update(sql)
+                else:
+                    return render_template("updateUserInfo.html",nombre=row[2],apellidoP=row[3],
+                                apellidoM=row[4],telefono=row[5],estado=row[7],ciudad=row[8],
+                                colonia=row[9],codigoPostal=row[10],direccion=row[11],
+                                email=bdEcommerce.buscarUnaLinea("usuario","idUsuario",session['idUsuario'])[0][1], error="Las contraseñas no coinciden")
+            return redirect('/')
     else:
         if session['idUsuario'] in row:
             return render_template("updateUserInfo.html",nombre=row[2],apellidoP=row[3],
@@ -375,10 +419,13 @@ def login():
     if request.method == 'POST':
         email=request.form['correo']
         password=request.form['password']
-        print(email)
-        print(password)
+        
         row=bdEcommerce.buscarUnaLinea("usuario","email",email)
-        print(row[0])
+        
+        if email=="" or password=="":
+            return render_template('login.html',error="Ingresa un correo y/o una contraseña")
+        if len(row)==0:
+            return render_template('login.html',error="Correo invalido")
         if (email in row[0]):
             if (password == row[0][2]):
                 session['email']=email

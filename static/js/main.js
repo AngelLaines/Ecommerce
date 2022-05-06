@@ -85,7 +85,7 @@
 
 
     // Product Quantity
-    $('.quantity button').on('click', function () {
+    /* $('.quantity button').on('click', function () {
         var button = $(this);
         var oldValue = button.parent().parent().find('input').val();
         if (button.hasClass('btn-plus')) {
@@ -98,7 +98,7 @@
             }
         }
         button.parent().parent().find('input').val(newVal);
-    });
+    }); */
     
 })(jQuery);
 

@@ -60,10 +60,10 @@ class datos():
         self.conexion.commit()
         cursor1.close()
         
-    def search(self,tabla,condicion):
+    def search(self,tabla,joinSQL,condicion):
         cursor1=self.conexion.cursor()
         #carrito ca join producto pr on ca.idproducto=pr.idproducto
-        sql="select * from "+tabla+ " ca join producto pr on ca.idproducto=pr.idproducto where "+condicion
+        sql="select * from "+tabla+ joinSQL +condicion
         print(sql)
         cursor1.execute(sql)
         consulta=cursor1.fetchall()

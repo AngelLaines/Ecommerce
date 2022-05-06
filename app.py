@@ -106,6 +106,8 @@ def deleteProduct():
             listaEliminar = request.form.getlist('checkbox')
             print(listaEliminar)
             for elemento in listaEliminar:
+                sql="delete from carrito where idProducto="+str(elemento)
+                bdEcommerce.delete(sql)
                 sql="delete from producto where idProducto="+str(elemento)
                 bdEcommerce.delete(sql)
                 os.remove('./static/img/'+elemento+'.png')

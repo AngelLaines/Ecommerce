@@ -4,7 +4,8 @@
 # 		Moreno Laines Angel Roberto: Backend
 # 		Rountree Robles Carlos Macoy
 #
-# Los archivos .html fueron tomados de Bootstrap, el trabajo tuvo lugar solo en Backend
+# Los archivos de la carpeta templates y static fueron tomados de Bootstrap (a excepción de login.html).
+# El trabajo realizado fue Backend en su mayoria.
 
 from flask import Flask, render_template, request, session
 from flask.templating import render_template_string

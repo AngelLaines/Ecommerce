@@ -1,3 +1,11 @@
+# Desarrollado por:
+# 		Castro Velazquez Omar Alberto
+# 		Leon Saenz Jaime Jesus
+# 		Moreno Laines Angel Roberto: Backend
+# 		Rountree Robles Carlos Macoy
+#
+# Los archivos html fueron tomados de Bootstrap, el trabajo tuvo lugar solo en Backend
+
 from flask import Flask, render_template, request, session
 from flask.templating import render_template_string
 from numpy import empty

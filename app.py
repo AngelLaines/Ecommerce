@@ -3,7 +3,7 @@
 # 		Leon Saenz Jaime Jesus
 # 		Moreno Laines Angel Roberto: Backend
 # 		Rountree Robles Carlos Macoy
-#
+# 
 # Los archivos de la carpeta templates y static fueron tomados de Bootstrap (a excepción de login.html).
 # El trabajo realizado fue Backend en su mayoria.
 
